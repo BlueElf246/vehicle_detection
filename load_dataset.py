@@ -56,6 +56,8 @@ def change_color_space(img,colorspace):
             img=cv2.cvtColor(img, cv2.COLOR_RGB2YCrCb)
         if colorspace == 'hls':
             img = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
+        if colorspace == 'yuv':
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2YUV)
     return img
 def extract_feature(dataset, color_space):
     dataset_feature=[]

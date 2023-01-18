@@ -4,6 +4,7 @@ import numpy as np
 import pickle
 from setting  import win_size
 from imutils.object_detection import  non_max_suppression
+import matplotlib.image as mpimg
 def load_classifier():
     d= pickle.load(open('lp_detect.p', 'rb'))
     return d
@@ -99,9 +100,9 @@ def draw(img,box):
         cv2.rectangle(img, (x[0],x[1]), (x[2],x[3]), (0,0,255), 2)
     return img
 params=load_classifier()
-img   = cv2.imread('test1.jpg')
+img   = mpimg.imread('test1.jpg')
 img1  = img.copy()
-img   = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+img   = change_color_space(img,params['color_space'])
 bbox, bbox_nms  = find_car_multi_scale(img,params, win_size)
 
 img   =draw(img, bbox)
