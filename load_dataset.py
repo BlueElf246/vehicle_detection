@@ -32,8 +32,11 @@ def spatial(img, size):
     img2= cv2.resize(img[:,:,1], size).ravel()
     img3= cv2.resize(img[:,:,2], size).ravel()
     return np.hstack((img1, img2, img3))
-def get_feature_of_image(img, orient=9, pix_per_cell=8, cell_per_block=2, spatial_size=(16,16), bins=16, feature_vector=True, vis=False ,hog_fea=True, color_fea=True, spatial_fea=True, special=True):
+def get_feature_of_image(img, orient=9, pix_per_cell=8, cell_per_block=2, spatial_size=(16,16),
+                         bins=16, feature_vector=True, vis=False ,hog_fea=True, color_fea=True,
+                         spatial_fea=True, special=True, color_space='RGB'):
     feature=[]
+    img = change_color_space(img, color_space)
     if hog_fea==True:
         h=[]
         for x in range(3):
@@ -63,10 +66,10 @@ def extract_feature(dataset, color_space):
     dataset_feature=[]
     for x in dataset:
         img=mpimg.imread(x)
-        img_resized= cv2.resize(img,(64,64))
-        img= change_color_space(img_resized, color_space)
-        feature=get_feature_of_image(img, orient=params['orient'], pix_per_cell=params['pix_per_cell'], cell_per_block=params['cell_per_block'],hog_fea=params['hog_feat'],
-                                     spatial_size=params['spatial_size'], spatial_fea=params['spatial_feat'],bins=params['hist_bins'], color_fea=params['hist_feat'], feature_vector=True, special=False)
+        img_resized= cv2.resize(img,(params['size_of_window'][0],params['size_of_window'][1]))
+        feature=get_feature_of_image(img_resized, orient=params['orient'], pix_per_cell=params['pix_per_cell'], cell_per_block=params['cell_per_block'],hog_fea=params['hog_feat'],
+                                     spatial_size=params['spatial_size'], spatial_fea=params['spatial_feat'],bins=params['hist_bins'], color_fea=params['hist_feat'],
+                                     feature_vector=True, special=False, color_space=color_space)
         dataset_feature.append(feature)
     return dataset_feature
 

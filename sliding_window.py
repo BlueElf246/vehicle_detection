@@ -2,6 +2,7 @@ import numpy as np
 from load_dataset import get_feature_of_image
 import cv2
 import pickle
+import time
 def sliding_window(img, x_start_stop=[None, None], y_start_stop=[None, None], xy_window=(64,64), xy_overlap=(0.5,0.5)):
     if x_start_stop[0]==None:
         x_start_stop[0]=0
@@ -40,7 +41,8 @@ def search_window(img, window, params):
         img_crop= img[x[0][1]:x[1][1], x[0][0]:x[1][0]]
         img_crop= cv2.resize(img_crop,(64,64))
         feature=get_feature_of_image(img_crop, orient=params['orient'], pix_per_cell=params['pix_per_cell'], cell_per_block=params['cell_per_block'],hog_fea=params['hog_feat'],
-                                     spatial_size=params['spatial_size'], spatial_fea=params['spatial_feat'],bins=params['hist_bins'], color_fea=params['hist_feat'], feature_vector=True, special=False)
+                                     spatial_size=params['spatial_size'], spatial_fea=params['spatial_feat'],bins=params['hist_bins'], color_fea=params['hist_feat'],
+                                     feature_vector=True, special=False, color_space=params['color_space'])
         feature_scaled=scaler.transform(np.array(feature).reshape(1, -1))
         prediction= clf.predict(feature_scaled)
         if prediction ==1:
@@ -49,11 +51,16 @@ def search_window(img, window, params):
 def draw(img,box):
     for x in box:
         cv2.rectangle(img, x[0], x[1], (0,0,255), 2)
+        cv2.imshow('img', img)
+        cv2.waitKey(0)
     return img
 def pipeline(img):
     params= pickle.load(open('lp_detect.p', "rb"))
-    window= sliding_window(img)
+    start= time.time()
+    window= sliding_window(img,xy_window=(83,83), xy_overlap=(0.7,0.7))
     box=search_window(img, window,params)
+    end= time.time()
+    print(end-start)
     img=draw(img, box)
     cv2.imshow('img',img)
     cv2.waitKey(0)

@@ -14,8 +14,8 @@ params['test_size']=0.2
 
 
 win_size={}
-win_size['scale_0']=(0,1000,0.8)
-win_size['scale_1']=(0,650,1.3)
-win_size['scale_2']=(0,650,1.8)
-win_size['scale_3']=(0,650,2.3)
-win_size['use_scale']=(0,)
+win_size['scale_0']=(375,1000,0.8)
+win_size['scale_1']=(375,1000,1.3)
+win_size['scale_2']=(375,1000,1.8)
+win_size['scale_3']=(375,1000,2.3)
+win_size['use_scale']=(1,0)

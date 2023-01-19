@@ -14,6 +14,8 @@ def sliding_window(img,params,scale, y_start_stop=[None, None], cell_per_step=2)
         y_start_stop[0]=0
     if y_start_stop[1]== None  or y_start_stop[1] > img.shape[0]:
         y_start_stop[1]= img.shape[0]
+
+    img=img[y_start_stop[0]:y_start_stop[1],:,:]
     win_x, win_y, channel= params['size_of_pic_train']
     pix_per_cell= params['pix_per_cell']
     svc= params['svc']
@@ -34,7 +36,7 @@ def sliding_window(img,params,scale, y_start_stop=[None, None], cell_per_step=2)
 
     h= get_feature_of_image(img, orient=params['orient'], pix_per_cell=params['pix_per_cell'], cell_per_block=params['cell_per_block'],hog_fea=params['hog_feat'],
                                      spatial_size=params['spatial_size'], spatial_fea=params['spatial_feat'],bins=params['hist_bins'], color_fea=params['hist_feat'],
-                                feature_vector=False, special=True)
+                                feature_vector=False, special=True, color_space=params['color_space'])
     ch1=h[0]
     ch2=h[1]
     ch3=h[2]
@@ -58,11 +60,11 @@ def sliding_window(img,params,scale, y_start_stop=[None, None], cell_per_step=2)
             scaled_feature=scaler.transform(np.array(feature).reshape(1,-1))
             prediction= svc.predict(scaled_feature)
             if prediction ==1:
-                x_start=np.int32(x_top*scale)
-                y_start=np.int32(y_top*scale+y_start_stop[0])
-                x_end  =np.int32((x_top+win_x)*scale)
-                y_end  =np.int32(scale*(y_top+win_y)+y_start_stop[0])
-                bbox.append([x_start,y_start,x_end, y_end])
+                xbox_left = np.int32(x_top * scale)
+                ytop_draw = np.int32(y_top * scale)
+                win_draw_x = np.int32(win_x * scale)
+                win_draw_y = np.int32(win_y * scale)
+                bbox.append([xbox_left, ytop_draw + y_start_stop[0],xbox_left + win_draw_x, ytop_draw + win_draw_y + y_start_stop[0]])
     return bbox
 def find_car_multi_scale(img,params, win_size):
     bboxes=[]
@@ -73,7 +75,7 @@ def find_car_multi_scale(img,params, win_size):
         y_start=win_size['scale_0'][0]
         y_stop=win_size['scale_0'][1]
         scale_0=win_size['scale_0'][2]
-        bboxes.append(sliding_window(img, params=params, y_start_stop=[None,None], cell_per_step=2, scale=0.8))
+        bboxes.append(sliding_window(img, params=params, y_start_stop=[y_start,y_stop], cell_per_step=2, scale=scale_0))
     if 1 in win_scale:
         y_start = win_size['scale_1'][0]
         y_stop = win_size['scale_1'][1]
@@ -99,14 +101,3 @@ def draw(img,box):
     for x in box:
         cv2.rectangle(img, (x[0],x[1]), (x[2],x[3]), (0,0,255), 2)
     return img
-params=load_classifier()
-img   = mpimg.imread('test1.jpg')
-img1  = img.copy()
-img   = change_color_space(img,params['color_space'])
-bbox, bbox_nms  = find_car_multi_scale(img,params, win_size)
-
-img   =draw(img, bbox)
-img1  =draw(img1, bbox_nms)
-i= np.concatenate((img,img1),axis=0)
-cv2.imshow('i',i)
-cv2.waitKey(0)
