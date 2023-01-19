@@ -18,4 +18,6 @@ win_size['scale_0']=(375,1000,0.8)
 win_size['scale_1']=(375,1000,1.3)
 win_size['scale_2']=(375,1000,1.8)
 win_size['scale_3']=(375,1000,2.3)
+win_size['thresh']=1
+win_size['overlap_thresh']= 0.3
 win_size['use_scale']=(1,0)
